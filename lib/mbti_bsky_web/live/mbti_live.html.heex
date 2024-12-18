@@ -1,0 +1,63 @@
+<div class="flex flex-col space-y-2">
+  <div>
+    <form phx-submit="analyse" class="flex flex-col space-y-2">
+      <div class="flex items-center border-2 border-gray-300 rounded-lg overflow-hidden focus-within:border-gray-500">
+        <span class="px-3 text-gray-500 bg-gray-50 h-full flex items-center border-r border-gray-300">
+          @
+        </span>
+        <input
+          name="handle"
+          autocomplete="off"
+          autocapitalize="off"
+          enterkeyhint="go"
+          spellcheck="false"
+          placeholder="handle"
+          min="2"
+          value=""
+          class="flex-1 px-3 py-2 font-mono focus:outline-none bg-white text-gray-900 disabled:bg-gray-50 disabled:text-gray-500"
+        />
+      </div>
+      <.button>Submit</.button>
+    </form>
+  </div>
+  <div>
+    <.async_result :let={result} assign={@result}>
+      <:loading>
+        <div class="flex items-center justify-center p-2 rounded">
+          <svg
+            class="animate-spin -ml-1 mr-3 h-5 w-5"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            >
+            </circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            >
+            </path>
+          </svg>
+          Analyzing...
+        </div>
+      </:loading>
+      <:failed :let={_failure}>there was an error</:failed>
+      <div class="space-y-2">
+        <div class="text-lg text-center uppercase">
+          {result["type"]}
+        </div>
+        <div>
+          {result["reason"]}
+        </div>
+      </div>
+    </.async_result>
+  </div>
+</div>
