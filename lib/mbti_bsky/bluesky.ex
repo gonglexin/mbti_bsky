@@ -7,7 +7,8 @@ defmodule MbtiBsky.Bluesky do
     response =
       BlueskyEx.Client.RecordManager.get_author_feed(session, actor: handle, limit: 100)
 
-    body = response.body |> JSON.decode()
+    # Switch to JSON after elixir 1.18
+    body = response.body |> Jason.decode()
 
     case body do
       {:ok, %{"feed" => feed}} ->
