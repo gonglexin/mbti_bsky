@@ -17,11 +17,8 @@ defmodule MbtiBsky.Bluesky do
 
         {:ok, feeds}
 
-      {:ok, %{"error" => %{"message" => message}}} ->
+      {:ok, %{"message" => message}} ->
         {:error, message}
-
-      _ ->
-        {:error, "Something wrong"}
     end
   end
 

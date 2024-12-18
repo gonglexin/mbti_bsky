@@ -49,8 +49,8 @@
           Analyzing...
         </div>
       </:loading>
-      <:failed :let={_failure}>there was an error</:failed>
-      <div class="space-y-2">
+      <:failed :let={failure}>{elem(failure, 1)}</:failed>
+      <div class="mt-4 space-y-2">
         <div class="text-lg text-center uppercase">
           {result["type"]}
         </div>

@@ -18,21 +18,31 @@ defmodule MbtiBskyWeb.MbtiLive do
     socket =
       socket
       |> assign(:result, AsyncResult.loading())
-      |> assign_async(:result, fn -> {:ok, %{result: analyse(handle)}} end)
+      |> assign_async(:result, fn ->
+        case analyse(handle) do
+          {:ok, result} ->
+            {:ok, %{result: result}}
+
+          {:error, message} ->
+            {:error, message}
+        end
+      end)
 
     {:noreply, socket}
   end
 
   defp analyse(handle) do
-    {:ok, feeds} = Bluesky.get_feeds_by_handle(handle)
+    case Bluesky.get_feeds_by_handle(handle) do
+      {:ok, feeds} ->
+        all_post_texts =
+          feeds
+          |> Enum.map(fn %{"post" => %{"record" => %{"text" => text}}} -> text end)
+          |> Enum.join("------------\n")
 
-    all_post_texts =
-      feeds
-      |> Enum.map(fn %{"post" => %{"record" => %{"text" => text}}} -> text end)
-      |> Enum.join("------------\n")
+        Ai.analyse(all_post_texts)
 
-    {:ok, result} = Ai.analyse(all_post_texts)
-
-    result
+      {:error, message} ->
+        {:error, message}
+    end
   end
 end
