@@ -1,7 +1,7 @@
 defmodule MbtiBsky.Ai do
   alias MbtiBsky.Moonshot
 
-  def analyse(tweets, model \\ "moonshot-v1-8k") do
+  def analyse(tweets, model \\ "moonshot-v1-32k") do
     system_prompt = """
     You are an MBTI expert responsible for determining a user's MBTI type based on their tweets.
 
@@ -17,6 +17,7 @@ defmodule MbtiBsky.Ai do
       %{
         model: model,
         response_format: %{type: "json_object"},
+        temperature: 0.2,
         messages: [
           %{role: "system", content: system_prompt},
           %{role: "user", content: tweets}
