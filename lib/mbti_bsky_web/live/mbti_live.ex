@@ -9,6 +9,7 @@ defmodule MbtiBskyWeb.MbtiLive do
   def mount(_params, _session, socket) do
     socket =
       socket
+      |> assign(:handle, nil)
       |> assign_async(:result, fn -> {:ok, %{result: nil}} end)
 
     {:ok, socket}
@@ -17,6 +18,7 @@ defmodule MbtiBskyWeb.MbtiLive do
   def handle_event("analyse", %{"handle" => handle}, socket) do
     socket =
       socket
+      |> assign(:handle, handle)
       |> assign(:result, AsyncResult.loading())
       |> assign_async(:result, fn ->
         case analyse(handle) do
