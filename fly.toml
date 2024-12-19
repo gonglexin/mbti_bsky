@@ -10,7 +10,7 @@ kill_signal = 'SIGTERM'
 [build]
 
 [env]
-  PHX_HOST = 'mbti-bsky.fly.dev'
+  PHX_HOST = 'mbti.blue'
   PORT = '8080'
 
 [http_service]
