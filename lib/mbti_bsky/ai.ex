@@ -27,8 +27,7 @@ defmodule MbtiBsky.Ai do
     case Moonshot.chat_completion(request) do
       {:ok, response} ->
         {:ok, content} = Moonshot.parse_chat(response.body)
-        # Switch to JSON after elixir 1.18
-        Jason.decode(content)
+        JSON.decode(content)
 
       {:error, e} ->
         {:error, e}
