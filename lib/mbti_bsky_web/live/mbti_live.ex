@@ -1,16 +1,14 @@
 defmodule MbtiBskyWeb.MbtiLive do
-  alias Phoenix.LiveView.AsyncResult
-  alias MbtiBsky.Ai
   use MbtiBskyWeb, :live_view
 
-  require Logger
-  alias MbtiBsky.Bluesky
+  alias MbtiBsky.{Ai, Bluesky}
+  alias Phoenix.LiveView.AsyncResult
 
   def mount(_params, _session, socket) do
     socket =
       socket
       |> assign(:handle, nil)
-      |> assign_async(:result, fn -> {:ok, %{result: nil}} end)
+      |> assign(:result, AsyncResult.ok(nil))
 
     {:ok, socket}
   end
