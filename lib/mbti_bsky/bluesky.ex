@@ -19,6 +19,9 @@ defmodule MbtiBsky.Bluesky do
 
       {:ok, %{"message" => message}} ->
         {:error, message}
+
+      e ->
+        e
     end
   end
 

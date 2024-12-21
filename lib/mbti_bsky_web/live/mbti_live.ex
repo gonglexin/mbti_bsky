@@ -43,6 +43,9 @@ defmodule MbtiBskyWeb.MbtiLive do
 
       {:error, message} ->
         {:error, message}
+
+      e ->
+        {:error, "Something wrong! #{inspect(e)}"}
     end
   end
 end
