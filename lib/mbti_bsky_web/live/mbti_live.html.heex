@@ -17,7 +17,12 @@
           class="flex-1 px-3 py-2 font-mono focus:outline-none bg-white text-gray-900 disabled:bg-gray-50 disabled:text-gray-500"
         />
       </div>
-      <.button class="bg-indigo-500 hover:bg-indigo-600">Submit</.button>
+      <button class={[
+        "phx-submit-loading:opacity-75 rounded-lg bg-indigo-500 hover:bg-indigo-600 py-2 px-3",
+        "text-sm font-semibold leading-6 text-white active:text-white/80"
+      ]}>
+        Submit
+      </button>
     </form>
   </div>
   <div>
