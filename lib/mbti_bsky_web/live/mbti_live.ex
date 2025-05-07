@@ -13,6 +13,14 @@ defmodule MbtiBskyWeb.MbtiLive do
     {:ok, socket}
   end
 
+  def handle_event("analyse", %{"handle" => handle}, socket) when handle == "" do
+    socket =
+      socket
+      |> put_flash(:error, "Please input the correct handle!")
+
+    {:noreply, socket}
+  end
+
   def handle_event("analyse", %{"handle" => handle}, socket) do
     socket =
       socket
