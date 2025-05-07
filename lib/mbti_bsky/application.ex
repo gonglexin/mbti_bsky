@@ -11,8 +11,6 @@ defmodule MbtiBsky.Application do
       MbtiBskyWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:mbti_bsky, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: MbtiBsky.PubSub},
-      # Start the Finch HTTP client for sending emails
-      {Finch, name: MbtiBsky.Finch},
       # Start a worker by calling: MbtiBsky.Worker.start_link(arg)
       # {MbtiBsky.Worker, arg},
       # Start to serve requests, typically the last entry

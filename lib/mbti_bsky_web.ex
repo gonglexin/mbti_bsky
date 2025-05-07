@@ -38,9 +38,7 @@ defmodule MbtiBskyWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: MbtiBskyWeb.Layouts]
+      use Phoenix.Controller, formats: [:html, :json]
 
       use Gettext, backend: MbtiBskyWeb.Gettext
 
@@ -52,8 +50,7 @@ defmodule MbtiBskyWeb do
 
   def live_view do
     quote do
-      use Phoenix.LiveView,
-        layout: {MbtiBskyWeb.Layouts, :app}
+      use Phoenix.LiveView
 
       unquote(html_helpers())
     end
@@ -90,8 +87,9 @@ defmodule MbtiBskyWeb do
       # Core UI components
       import MbtiBskyWeb.CoreComponents
 
-      # Shortcut for generating JS commands
+      # Common modules used in templates
       alias Phoenix.LiveView.JS
+      alias MbtiBskyWeb.Layouts
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())
