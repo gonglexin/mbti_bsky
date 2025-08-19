@@ -25,7 +25,7 @@
           setTheme(localStorage.getItem("phx:theme") || "light");
         }
         window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
-        window.addEventListener("phx:set-theme", ({ detail: { theme } }) => setTheme(theme));
+        window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
       })();
     </script>
     <!-- Google tag (gtag.js) -->
