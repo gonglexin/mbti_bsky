@@ -36,34 +36,37 @@ defmodule MbtiBskyWeb.Layouts do
   def app(assigns) do
     ~H"""
     <div class="flex flex-col min-h-screen">
-    <header class="px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
-        <div class="flex mx-auto sm:text-base md:text-lg font-bold">
-          <div class="bg-indigo-500 hover:bg-indigo-600 rounded text-white">
-            <a href="https://bsky.app/profile/mbti.blue" class="p-4">
+      <header class="px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
+          <div class="flex mx-auto sm:text-base md:text-lg font-bold">
+            <div class="bg-indigo-500 hover:bg-indigo-600 rounded text-white">
+            <a
+                href="https://bsky.app/profile/mbti.blue"
+                class="p-4"
+              >
               MBTI.BLUE
             </a>
           </div>&nbsp;<span class="text-gray-500">- MBTI Test for Bluesky</span>
+          </div>
+          <%!-- <.theme_toggle /> --%>
         </div>
-        <%!-- <.theme_toggle /> --%>
-      </div>
-    </header>
+      </header>
 
-    <main class="px-4 py-20 sm:px-6 lg:px-8 grow">
-      <div class="mx-auto max-w-2xl space-y-4">
-        {render_slot(@inner_block)}
-      </div>
-    </main>
+      <main class="px-4 py-20 sm:px-6 lg:px-8 grow">
+        <div class="mx-auto max-w-2xl space-y-4">
+          {render_slot(@inner_block)}
+        </div>
+      </main>
 
-    <footer class="flex justify-center text-gray-300 text-sm p-4 border-t">
-      &copy;2025 &nbsp;
-      <a href="https://bsky.app/profile/gonglexin.com">
-        Created by
-        <span class="underline underline-offset-4 hover:text-gray-400">@gonglexin.com</span>
-      </a>
-    </footer>
+      <footer class="flex justify-center text-gray-300 text-sm p-4 border-t">
+        &copy;2026 &nbsp;
+        <a href="https://bsky.app/profile/gonglexin.com">
+          Created by
+          <span class="underline underline-offset-4 hover:text-gray-400">@gonglexin.com</span>
+        </a>
+      </footer>
 
-    <.flash_group flash={@flash} />
+      <.flash_group flash={@flash} />
     </div>
     """
   end

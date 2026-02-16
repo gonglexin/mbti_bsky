@@ -27,7 +27,11 @@ defmodule MbtiBsky.Ai do
     case OpenRouter.chat_completion(request) do
       {:ok, response} ->
         {:ok, content} = OpenRouter.parse_chat(response.body)
-        JSON.decode(content)
+
+        case JSON.decode(content) do
+          {:ok, result} -> {:ok, result}
+          {:error, reason} -> {:error, reason}
+        end
 
       {:error, e} ->
         {:error, e}
