@@ -1,5 +1,5 @@
-defmodule MbtiBsky.Moonshot do
-  @chat_completions_url "https://api.moonshot.cn/v1/chat/completions"
+defmodule MbtiBsky.OpenRouter do
+  @chat_completions_url "https://openrouter.ai/api/v1/chat/completions"
 
   def chat_completion(request) do
     Req.post(@chat_completions_url,
@@ -17,7 +17,7 @@ defmodule MbtiBsky.Moonshot do
   end
 
   defp api_key() do
-    System.get_env("OPENAI_API_KEY")
+    System.get_env("OPENROUTER_API_KEY")
   end
 
   def parse_chat(%{"choices" => [%{"message" => %{"content" => content}} | _]}) do

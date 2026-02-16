@@ -1,7 +1,7 @@
 defmodule MbtiBsky.Ai do
-  alias MbtiBsky.Moonshot
+  alias MbtiBsky.OpenRouter
 
-  def analyse(tweets, model \\ "moonshot-v1-32k") do
+  def analyse(tweets, model \\ "google/gemini-2.5-flash-lite") do
     system_prompt = """
     You are an MBTI expert responsible for determining a user's MBTI type based on their tweets.
 
@@ -24,9 +24,9 @@ defmodule MbtiBsky.Ai do
         ]
       }
 
-    case Moonshot.chat_completion(request) do
+    case OpenRouter.chat_completion(request) do
       {:ok, response} ->
-        {:ok, content} = Moonshot.parse_chat(response.body)
+        {:ok, content} = OpenRouter.parse_chat(response.body)
         JSON.decode(content)
 
       {:error, e} ->
