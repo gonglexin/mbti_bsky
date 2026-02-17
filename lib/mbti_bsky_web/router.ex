@@ -18,6 +18,7 @@ defmodule MbtiBskyWeb.Router do
     pipe_through :browser
 
     live "/", MbtiLive
+    live "/result/:handle", ResultLive
   end
 
   # Other scopes may use custom stacks.

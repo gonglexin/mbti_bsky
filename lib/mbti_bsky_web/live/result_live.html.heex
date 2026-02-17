@@ -1,61 +1,85 @@
 <Layouts.app flash={@flash}>
   <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900">
+    <script :type={Phoenix.LiveView.ColocatedHook} name=".ShareHandler">
+      export default {
+        mounted() {
+          this.handleEvent("copy_url", ({url}) => {
+            navigator.clipboard.writeText(url);
+          });
+          this.handleEvent("select_input", ({id}) => {
+            const input = document.getElementById(id);
+            if (input) {
+              input.select();
+            }
+          });
+        }
+      }
+    </script>
     <div class="container mx-auto px-4 py-8 md:py-16">
-      <!-- Hero Section -->
-      <div class="text-center mb-12">
-        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
-          Discover Your MBTI
-        </h1>
-        <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-          Enter a Bluesky handle and let AI analyze their tweets to reveal their personality type
-        </p>
-      </div>
-      
-<!-- Search Form -->
-      <div class="max-w-2xl mx-auto mb-12">
-        <form phx-submit="analyse" class="relative group">
-          <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-            <.icon
-              name="hero-magnifying-glass"
-              class="w-6 h-6 text-gray-400 group-focus-within:text-indigo-500 transition-colors"
-            />
+      <!-- Header -->
+      <div class="max-w-5xl mx-auto mb-8">
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl p-3 shadow-lg">
+              <.icon name="hero-at-symbol" class="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                {@handle}
+              </h1>
+              <p class="text-gray-600 dark:text-gray-400 text-sm">
+                MBTI Analysis Result
+              </p>
+            </div>
           </div>
-          <input
-            name="handle"
-            autocomplete="off"
-            autocapitalize="off"
-            enterkeyhint="go"
-            spellcheck="false"
-            placeholder="Enter Bluesky handle (e.g., bsky.app)"
-            min="2"
-            value={@handle}
-            class={[
-              "w-full pl-12 pr-40 py-4 text-lg",
-              "rounded-2xl border-2 border-gray-200 dark:border-gray-700",
-              "bg-white dark:bg-gray-800",
-              "text-gray-900 dark:text-white",
-              "focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400",
-              "shadow-lg focus:shadow-xl transition-all duration-300"
-            ]}
-          />
-          <button
-            type="submit"
-            class={[
-              "absolute right-2 top-1/2 -translate-y-1/2",
-              "px-6 py-2.5 rounded-xl",
-              "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600",
-              "text-white font-semibold",
-              "shadow-md hover:shadow-lg",
-              "transition-all duration-200",
-              "phx-submit-loading:opacity-50 phx-submit-loading:cursor-not-allowed"
-            ]}
-          >
-            <.icon name="hero-sparkles" class="w-5 h-5" />
-          </button>
-        </form>
+
+          <div class="flex items-center gap-2">
+            <%= if @is_expired do %>
+              <div class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/40 text-yellow-900 dark:text-yellow-200 text-sm">
+                <.icon name="hero-clock" class="w-4 h-4" />
+                <span>Cache expired</span>
+              </div>
+            <% end %>
+
+            <button
+              phx-click="regenerate"
+              disabled={@is_regenerating}
+              class={[
+                "flex items-center gap-2 px-4 py-2 rounded-xl",
+                "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600",
+                "text-white font-semibold",
+                "shadow-md hover:shadow-lg",
+                "transition-all duration-200",
+                @is_regenerating && "opacity-50 cursor-not-allowed"
+              ]}
+            >
+              <.icon
+                name="hero-arrow-path"
+                class={["w-4 h-4", @is_regenerating && "animate-spin"]}
+              />
+              <span class="hidden sm:inline">Regenerate</span>
+            </button>
+
+            <button
+              phx-click={JS.navigate(~p"/")}
+              class={[
+                "flex items-center gap-2 px-4 py-2 rounded-xl",
+                "bg-white dark:bg-gray-800",
+                "border-2 border-gray-200 dark:border-gray-700",
+                "text-gray-700 dark:text-gray-300",
+                "hover:bg-gray-50 dark:hover:bg-gray-700",
+                "shadow-sm hover:shadow-md",
+                "transition-all duration-200"
+              ]}
+            >
+              <.icon name="hero-home" class="w-4 h-4" />
+              <span class="hidden sm:inline">New Analysis</span>
+            </button>
+          </div>
+        </div>
       </div>
       
-<!-- Results Section -->
+<!-- Results -->
       <div>
         <.async_result :let={result} assign={@result}>
           <:loading>
@@ -93,51 +117,12 @@
           </:failed>
 
           <div :if={@mbti_info != nil} class="max-w-5xl mx-auto space-y-8">
-            <!-- Share Link -->
-            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-2xl p-6">
-              <div class="flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                  <.icon name="hero-share" class="w-5 h-5 text-indigo-500" />
-                  <span class="font-semibold text-gray-900 dark:text-white">
-                    Share this result
-                  </span>
-                </div>
-                <div class="flex gap-2">
-                  <input
-                    type="text"
-                    readonly
-                    value={@share_url}
-                    class={[
-                      "flex-1 px-4 py-2 rounded-xl",
-                      "bg-white dark:bg-gray-800",
-                      "border-2 border-gray-200 dark:border-gray-700",
-                      "text-gray-900 dark:text-white",
-                      "font-mono text-sm w-64"
-                    ]}
-                    phx-click={JS.exec("select", to: "input")}
-                  />
-                  <.link
-                    navigate={@share_url}
-                    class={[
-                      "px-4 py-2 rounded-xl",
-                      "bg-indigo-500 hover:bg-indigo-600",
-                      "text-white",
-                      "shadow-md hover:shadow-lg",
-                      "transition-all duration-200"
-                    ]}
-                  >
-                    <.icon name="hero-arrow-up-right" class="w-5 h-5" />
-                  </.link>
-                </div>
-              </div>
-            </div>
-            
-<!-- MBTI Type Card -->
+            <!-- MBTI Type Card -->
             <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden">
               <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-8 md:p-12">
                 <div class="text-center">
                   <p class="text-white/80 text-sm md:text-base font-medium uppercase tracking-wider mb-2">
-                    Your MBTI Type
+                    MBTI Type
                   </p>
                   <h2 class="text-6xl md:text-8xl font-bold text-white mb-4 tracking-tight">
                     {result["type"]}
@@ -269,6 +254,42 @@
                   <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
                     {result["reason"]}
                   </p>
+                </div>
+                
+<!-- Share Link -->
+                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-2xl p-6">
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <.icon name="hero-share" class="w-5 h-5 text-indigo-500" /> Share This Result
+                  </h3>
+                  <div class="flex gap-2">
+                    <input
+                      type="text"
+                      readonly
+                      id="share-url"
+                      value={~p"/result/#{@handle}"}
+                      class={[
+                        "flex-1 px-4 py-2 rounded-xl",
+                        "bg-white dark:bg-gray-800",
+                        "border-2 border-gray-200 dark:border-gray-700",
+                        "text-gray-900 dark:text-white",
+                        "font-mono text-sm"
+                      ]}
+                      phx-click="select_share_url"
+                    />
+                    <button
+                      phx-click="copy_share_url"
+                      class={[
+                        "px-4 py-2 rounded-xl",
+                        "bg-indigo-500 hover:bg-indigo-600",
+                        "text-white",
+                        "shadow-md hover:shadow-lg",
+                        "transition-all duration-200"
+                      ]}
+                      title="Copy to clipboard"
+                    >
+                      <.icon name="hero-document-duplicate" class="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

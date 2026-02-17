@@ -1,7 +1,12 @@
 import Config
 
-# We don't run a server during test. If one is required,
-# you can enable the server option below.
+config :mbti_bsky, MbtiBsky.Repo,
+  database: "mbti_bsky_test",
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  pool: Ecto.Adapters.SQL.Sandbox
+
 config :mbti_bsky, MbtiBskyWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "Zxjg4ftbgPAZI/cykZa+pQ97sZVbUPV/jAK8wyzWd2+159oUm73Kqzlea0HUf/BP",

@@ -4,11 +4,18 @@
 # This configuration file is loaded before any dependency and
 # is restricted to this project.
 
-# General application configuration
 import Config
 
 config :mbti_bsky,
+  ecto_repos: [MbtiBsky.Repo],
   generators: [timestamp_type: :utc_datetime]
+
+config :mbti_bsky, MbtiBsky.Repo,
+  database: "mbti_bsky_dev",
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  pool_size: 10
 
 # Configure the endpoint
 config :mbti_bsky, MbtiBskyWeb.Endpoint,
