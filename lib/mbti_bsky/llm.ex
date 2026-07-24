@@ -1,12 +1,11 @@
-defmodule MbtiBsky.OpenRouter do
-  @chat_completions_url "https://openrouter.ai/api/v1/chat/completions"
+defmodule MbtiBsky.Llm do
+  @default_endpoint "https://aihubmix.com/v1/chat/completions"
 
   def chat_completion(request) do
-    Req.post(@chat_completions_url,
+    Req.post(endpoint_url(),
       json: set_stream(request, false),
       auth: {:bearer, api_key()},
-      receive_timeout: 600_000,
-      connect_options: [protocols: [:http1]]
+      receive_timeout: 600_000
     )
   end
 
@@ -16,8 +15,12 @@ defmodule MbtiBsky.OpenRouter do
     |> Map.put(:stream, value)
   end
 
-  defp api_key() do
-    System.get_env("OPENROUTER_API_KEY")
+  defp endpoint_url do
+    System.get_env("LLM_ENDPOINT") || @default_endpoint
+  end
+
+  defp api_key do
+    System.get_env("LLM_API_KEY")
   end
 
   def parse_chat(%{"choices" => [%{"message" => %{"content" => content}} | _]}) do

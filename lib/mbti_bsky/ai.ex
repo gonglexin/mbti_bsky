@@ -1,7 +1,7 @@
 defmodule MbtiBsky.Ai do
-  alias MbtiBsky.OpenRouter
+  alias MbtiBsky.Llm
 
-  def analyse(tweets, model \\ "google/gemini-2.5-flash-lite") do
+  def analyse(tweets, model \\ "gemini-2.5-flash-lite") do
     system_prompt = """
     You are an MBTI expert responsible for determining a user's MBTI type based on their tweets.
 
@@ -24,9 +24,9 @@ defmodule MbtiBsky.Ai do
         ]
       }
 
-    case OpenRouter.chat_completion(request) do
+    case Llm.chat_completion(request) do
       {:ok, response} ->
-        {:ok, content} = OpenRouter.parse_chat(response.body)
+        {:ok, content} = Llm.parse_chat(response.body)
 
         case JSON.decode(content) do
           {:ok, result} -> {:ok, result}
