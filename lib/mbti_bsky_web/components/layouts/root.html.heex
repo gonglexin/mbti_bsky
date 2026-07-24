@@ -3,8 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Discover your MBTI personality type from your Bluesky posts. Free, AI-powered personality analysis in seconds."
+    />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title default="MBTI Test for Bluesky" suffix=" · mbit.blue">
+    <.live_title default="MBTI Test for Bluesky" suffix=" · mbti.blue">
       {assigns[:page_title]}
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
@@ -22,24 +26,26 @@
           }
         };
         if (!document.documentElement.hasAttribute("data-theme")) {
-          setTheme(localStorage.getItem("phx:theme") || "light");
+          // Dark is the default theme (DESIGN.md §7).
+          setTheme(localStorage.getItem("phx:theme") || "dark");
         }
         window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
         window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
       })();
     </script>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FL5T49KEZP">
-    </script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+    <%= if tracking_id = System.get_env("GA_TRACKING_ID") do %>
+      <script async src={"https://www.googletagmanager.com/gtag/js?id=#{tracking_id}"}>
+      </script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-      gtag('config', 'G-FL5T49KEZP');
-    </script>
+        gtag('config', '<%= tracking_id %>');
+      </script>
+    <% end %>
   </head>
-  <body class="font-mono">
+  <body>
     {@inner_content}
   </body>
 </html>

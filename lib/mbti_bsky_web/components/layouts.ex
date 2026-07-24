@@ -35,35 +35,39 @@ defmodule MbtiBskyWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <div class="flex flex-col min-h-screen">
+    <div class="flex flex-col min-h-screen bg-canvas text-text">
       <header class="px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
-          <div class="flex mx-auto sm:text-base md:text-lg font-bold">
-            <div class="bg-indigo-500 hover:bg-indigo-600 rounded text-white">
+        <div class="mx-auto flex max-w-5xl items-center justify-between border-b border-border py-4">
+          <div class="flex items-center gap-2">
             <a
-                href="https://bsky.app/profile/mbti.blue"
-                class="p-4"
-              >
+              href="https://bsky.app/profile/mbti.blue"
+              class="rounded-pill bg-surface-2 px-4 py-2 text-small font-bold tracking-wide text-text transition-colors hover:bg-surface-3"
+            >
               MBTI.BLUE
             </a>
-          </div>&nbsp;<span class="text-gray-500">- MBTI Test for Bluesky</span>
+            <span class="hidden text-small text-text-faint sm:inline">MBTI Test for Bluesky</span>
           </div>
-          <%!-- <.theme_toggle /> --%>
+          <.theme_toggle />
         </div>
       </header>
 
-      <main class="px-4 py-20 sm:px-6 lg:px-8 grow">
-        <div class="mx-auto max-w-2xl space-y-4">
+      <main class="w-full max-w-full grow overflow-x-hidden px-4 py-20 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-5xl space-y-4">
           {render_slot(@inner_block)}
         </div>
       </main>
 
-      <footer class="flex justify-center text-gray-300 text-sm p-4 border-t">
-        &copy;2026 &nbsp;
-        <a href="https://bsky.app/profile/gonglexin.com">
-          Created by
-          <span class="underline underline-offset-4 hover:text-gray-400">@gonglexin.com</span>
-        </a>
+      <footer class="border-t border-border px-4 py-6 text-small text-text-muted">
+        <div class="mx-auto flex max-w-5xl items-center justify-center gap-1">
+          <span>&copy;2026</span>
+          <span>·</span>
+          <a
+            href="https://bsky.app/profile/gonglexin.com"
+            class="transition-colors hover:text-text"
+          >
+            Created by <span class="underline underline-offset-4">@gonglexin.com</span>
+          </a>
+        </div>
       </footer>
 
       <.flash_group flash={@flash} />
@@ -121,31 +125,34 @@ defmodule MbtiBskyWeb.Layouts do
   """
   def theme_toggle(assigns) do
     ~H"""
-    <div class="card relative flex flex-row items-center border-2 border-base-300 bg-base-300 rounded-full">
-      <div class="absolute w-1/3 h-full rounded-full border-1 border-base-200 bg-base-100 brightness-200 left-0 [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3 transition-[left]" />
+    <div class="relative flex flex-row items-center rounded-pill border border-border bg-surface-2">
+      <div class="pointer-events-none absolute left-0 h-full w-1/3 rounded-pill bg-surface-3 transition-[left] [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3" />
 
       <button
-        class="flex p-2 cursor-pointer w-1/3"
+        class="relative z-10 flex w-1/3 cursor-pointer justify-center p-2 opacity-60 hover:opacity-100"
         phx-click={JS.dispatch("phx:set-theme")}
         data-phx-theme="system"
+        aria-label={gettext("System theme")}
       >
-        <.icon name="hero-computer-desktop-micro" class="size-4 opacity-75 hover:opacity-100" />
+        <.icon name="hero-computer-desktop-micro" class="size-4" />
       </button>
 
       <button
-        class="flex p-2 cursor-pointer w-1/3"
+        class="relative z-10 flex w-1/3 cursor-pointer justify-center p-2 opacity-60 hover:opacity-100"
         phx-click={JS.dispatch("phx:set-theme")}
         data-phx-theme="light"
+        aria-label={gettext("Light theme")}
       >
-        <.icon name="hero-sun-micro" class="size-4 opacity-75 hover:opacity-100" />
+        <.icon name="hero-sun-micro" class="size-4" />
       </button>
 
       <button
-        class="flex p-2 cursor-pointer w-1/3"
+        class="relative z-10 flex w-1/3 cursor-pointer justify-center p-2 opacity-60 hover:opacity-100"
         phx-click={JS.dispatch("phx:set-theme")}
         data-phx-theme="dark"
+        aria-label={gettext("Dark theme")}
       >
-        <.icon name="hero-moon-micro" class="size-4 opacity-75 hover:opacity-100" />
+        <.icon name="hero-moon-micro" class="size-4" />
       </button>
     </div>
     """

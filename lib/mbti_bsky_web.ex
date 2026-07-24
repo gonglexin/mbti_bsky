@@ -86,6 +86,7 @@ defmodule MbtiBskyWeb do
       import Phoenix.HTML
       # Core UI components
       import MbtiBskyWeb.CoreComponents
+      import MbtiBskyWeb.MbtiComponents
 
       # Common modules used in templates
       alias Phoenix.LiveView.JS

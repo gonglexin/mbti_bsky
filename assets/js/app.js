@@ -25,11 +25,56 @@ import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/mbti_bsky"
 import topbar from "../vendor/topbar"
 
+const TypeReveal = {
+  mounted() {
+    const letters = this.el.querySelectorAll("span")
+    letters.forEach((letter, i) => {
+      letter.style.animationDelay = `${i * 32}ms`
+      letter.classList.add("animate-type-cascade")
+    })
+  }
+}
+
+const RevealOnScroll = {
+  mounted() {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (prefersReduced) {
+      this.el.classList.add("animate-section-in")
+      return
+    }
+    const rect = this.el.getBoundingClientRect()
+    if (rect.top < window.innerHeight * 0.9) {
+      this.el.classList.add("animate-section-in")
+      return
+    }
+    this.el.style.opacity = "0"
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("animate-section-in")
+            entry.target.style.opacity = ""
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -10% 0px" }
+    )
+    observer.observe(this.el)
+    this.observer = observer
+  },
+  destroyed() {
+    if (this.observer) {
+      this.observer.disconnect()
+    }
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {...colocatedHooks, TypeReveal, RevealOnScroll},
 })
 
 // Show progress bar on live navigation and form submits

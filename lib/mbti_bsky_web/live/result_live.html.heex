@@ -1,301 +1,168 @@
 <Layouts.app flash={@flash}>
-  <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900">
-    <script :type={Phoenix.LiveView.ColocatedHook} name=".ShareHandler">
-      export default {
-        mounted() {
-          this.handleEvent("copy_url", ({url}) => {
-            navigator.clipboard.writeText(url);
-          });
-          this.handleEvent("select_input", ({id}) => {
-            const input = document.getElementById(id);
-            if (input) {
-              input.select();
-            }
-          });
-        }
+  <script :type={Phoenix.LiveView.ColocatedHook} name=".ShareHandler">
+    export default {
+      mounted() {
+        this.handleEvent("copy_url", ({ url }) => {
+          navigator.clipboard.writeText(url);
+        });
+        this.handleEvent("select_input", ({ id }) => {
+          const input = document.getElementById(id);
+          if (input) {
+            input.select();
+          }
+        });
       }
-    </script>
-    <div class="container mx-auto px-4 py-8 md:py-16">
-      <!-- Header -->
-      <div class="max-w-5xl mx-auto mb-8">
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <div class="bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl p-3 shadow-lg">
-              <.icon name="hero-at-symbol" class="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-                {@handle}
-              </h1>
-              <p class="text-gray-600 dark:text-gray-400 text-sm">
-                MBTI Analysis Result
-              </p>
-            </div>
-          </div>
+    }
+  </script>
 
-          <div class="flex items-center gap-2">
-            <%= if @is_expired do %>
-              <div class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/40 text-yellow-900 dark:text-yellow-200 text-sm">
-                <.icon name="hero-clock" class="w-4 h-4" />
-                <span>Cache expired</span>
-              </div>
-            <% end %>
-
-            <button
-              phx-click="regenerate"
-              disabled={@is_regenerating}
-              class={[
-                "flex items-center gap-2 px-4 py-2 rounded-xl",
-                "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600",
-                "text-white font-semibold",
-                "shadow-md hover:shadow-lg",
-                "transition-all duration-200",
-                @is_regenerating && "opacity-50 cursor-not-allowed"
-              ]}
-            >
-              <.icon
-                name="hero-arrow-path"
-                class={["w-4 h-4", @is_regenerating && "animate-spin"]}
-              />
-              <span class="hidden sm:inline">Regenerate</span>
-            </button>
-
-            <button
-              phx-click={JS.navigate(~p"/")}
-              class={[
-                "flex items-center gap-2 px-4 py-2 rounded-xl",
-                "bg-white dark:bg-gray-800",
-                "border-2 border-gray-200 dark:border-gray-700",
-                "text-gray-700 dark:text-gray-300",
-                "hover:bg-gray-50 dark:hover:bg-gray-700",
-                "shadow-sm hover:shadow-md",
-                "transition-all duration-200"
-              ]}
-            >
-              <.icon name="hero-home" class="w-4 h-4" />
-              <span class="hidden sm:inline">New Analysis</span>
-            </button>
-          </div>
-        </div>
+  <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="flex size-12 items-center justify-center rounded-pill border border-border bg-surface-2">
+        <.icon name="hero-at-symbol" class="size-5 text-text-muted" />
       </div>
-      
-<!-- Results -->
       <div>
-        <.async_result :let={result} assign={@result}>
-          <:loading>
-            <div class="flex flex-col items-center justify-center py-20">
-              <div class="relative">
-                <div class="absolute inset-0 rounded-full bg-indigo-500 opacity-20 animate-ping">
-                </div>
-                <div class="relative rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 p-4 shadow-xl">
-                  <.icon name="hero-sparkles" class="w-12 h-12 text-white animate-spin" />
-                </div>
-              </div>
-              <p class="mt-6 text-xl text-gray-600 dark:text-gray-300 font-medium">
-                Analyzing tweets...
-              </p>
-              <p class="text-gray-500 dark:text-gray-400 mt-2">This may take a moment</p>
-            </div>
-          </:loading>
-
-          <:failed :let={failure}>
-            <div class="max-w-lg mx-auto">
-              <div class="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-2xl p-6">
-                <div class="flex items-start gap-3">
-                  <div class="flex-shrink-0">
-                    <.icon name="hero-exclamation-triangle" class="w-6 h-6 text-red-500" />
-                  </div>
-                  <div>
-                    <h3 class="text-lg font-semibold text-red-900 dark:text-red-200 mb-1">
-                      Analysis Failed
-                    </h3>
-                    <p class="text-red-700 dark:text-red-300">{elem(failure, 1)}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </:failed>
-
-          <div :if={@mbti_info != nil} class="max-w-5xl mx-auto space-y-8">
-            <!-- MBTI Type Card -->
-            <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden">
-              <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-8 md:p-12">
-                <div class="text-center">
-                  <p class="text-white/80 text-sm md:text-base font-medium uppercase tracking-wider mb-2">
-                    MBTI Type
-                  </p>
-                  <h2 class="text-6xl md:text-8xl font-bold text-white mb-4 tracking-tight">
-                    {result["type"]}
-                  </h2>
-                  <p class="text-xl md:text-2xl text-white font-semibold">
-                    {assigns.mbti_info.name}
-                  </p>
-                </div>
-              </div>
-
-              <div class="p-6 md:p-8 space-y-6">
-                <!-- Description -->
-                <div class="text-center">
-                  <p class="text-lg md:text-xl text-gray-700 dark:text-gray-200 leading-relaxed">
-                    {assigns.mbti_info.description}
-                  </p>
-                </div>
-                
-<!-- Dimensions -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <.dimension_card
-                    label="E/I"
-                    value={assigns.mbti_info.dimensions["E/I"]}
-                    is_ei={String.starts_with?(result["type"], "E")}
-                  />
-                  <.dimension_card
-                    label="S/N"
-                    value={assigns.mbti_info.dimensions["S/N"]}
-                    is_sn={String.at(result["type"], 1) == "N"}
-                  />
-                  <.dimension_card
-                    label="T/F"
-                    value={assigns.mbti_info.dimensions["T/F"]}
-                    is_tf={String.at(result["type"], 2) == "T"}
-                  />
-                  <.dimension_card
-                    label="J/P"
-                    value={assigns.mbti_info.dimensions["J/P"]}
-                    is_jp={String.at(result["type"], 3) == "J"}
-                  />
-                </div>
-                
-<!-- Traits -->
-                <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 rounded-2xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <.icon name="hero-light-bulb" class="w-5 h-5 text-indigo-500" /> Key Traits
-                  </h3>
-                  <div class="flex flex-wrap gap-2">
-                    <.trait_tag :for={trait <- assigns.mbti_info.traits}>
-                      {trait}
-                    </.trait_tag>
-                  </div>
-                </div>
-                
-<!-- Strengths and Weaknesses -->
-                <div class="grid md:grid-cols-2 gap-6">
-                  <div class="bg-green-50 dark:bg-green-900/20 rounded-2xl p-6 border-2 border-green-200 dark:border-green-800">
-                    <h3 class="text-lg font-semibold text-green-900 dark:text-green-200 mb-4 flex items-center gap-2">
-                      <.icon name="hero-check-circle" class="w-5 h-5" /> Strengths
-                    </h3>
-                    <ul class="space-y-2">
-                      <li
-                        :for={strength <- assigns.mbti_info.strengths}
-                        class="flex items-start gap-2"
-                      >
-                        <.icon
-                          name="hero-chevron-right"
-                          class="w-4 h-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0"
-                        />
-                        <span class="text-green-900 dark:text-green-200">{strength}</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div class="bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-6 border-2 border-orange-200 dark:border-orange-800">
-                    <h3 class="text-lg font-semibold text-orange-900 dark:text-orange-200 mb-4 flex items-center gap-2">
-                      <.icon name="hero-x-circle" class="w-5 h-5" /> Weaknesses
-                    </h3>
-                    <ul class="space-y-2">
-                      <li
-                        :for={weakness <- assigns.mbti_info.weaknesses}
-                        class="flex items-start gap-2"
-                      >
-                        <.icon
-                          name="hero-chevron-right"
-                          class="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0"
-                        />
-                        <span class="text-orange-900 dark:text-orange-200">{weakness}</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                
-<!-- Famous People -->
-                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-2xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <.icon name="hero-star" class="w-5 h-5 text-indigo-500" />
-                    Famous {assigns.mbti_info.name}s
-                  </h3>
-                  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                    <div
-                      :for={person <- assigns.mbti_info.famous_people}
-                      class="bg-white dark:bg-gray-700 rounded-xl p-4 text-center shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <.icon name="hero-user" class="w-8 h-8 mx-auto text-indigo-500 mb-2" />
-                      <p class="text-sm font-medium text-gray-900 dark:text-white">{person}</p>
-                    </div>
-                  </div>
-                </div>
-                
-<!-- Careers -->
-                <div class="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/30 dark:to-rose-900/30 rounded-2xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <.icon name="hero-briefcase" class="w-5 h-5 text-pink-500" />
-                    Well-Suited Careers
-                  </h3>
-                  <div class="flex flex-wrap gap-2">
-                    <.career_tag :for={career <- assigns.mbti_info.careers}>
-                      {career}
-                    </.career_tag>
-                  </div>
-                </div>
-                
-<!-- AI Reason -->
-                <div class="border-t-2 border-gray-200 dark:border-gray-700 pt-6">
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                    <.icon name="hero-sparkles" class="w-5 h-5 text-purple-500" /> AI Analysis
-                  </h3>
-                  <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                    {result["reason"]}
-                  </p>
-                </div>
-                
-<!-- Share Link -->
-                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-2xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <.icon name="hero-share" class="w-5 h-5 text-indigo-500" /> Share This Result
-                  </h3>
-                  <div class="flex gap-2">
-                    <input
-                      type="text"
-                      readonly
-                      id="share-url"
-                      value={~p"/result/#{@handle}"}
-                      class={[
-                        "flex-1 px-4 py-2 rounded-xl",
-                        "bg-white dark:bg-gray-800",
-                        "border-2 border-gray-200 dark:border-gray-700",
-                        "text-gray-900 dark:text-white",
-                        "font-mono text-sm"
-                      ]}
-                      phx-click="select_share_url"
-                    />
-                    <button
-                      phx-click="copy_share_url"
-                      class={[
-                        "px-4 py-2 rounded-xl",
-                        "bg-indigo-500 hover:bg-indigo-600",
-                        "text-white",
-                        "shadow-md hover:shadow-lg",
-                        "transition-all duration-200"
-                      ]}
-                      title="Copy to clipboard"
-                    >
-                      <.icon name="hero-document-duplicate" class="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </.async_result>
+        <h1 class="font-display text-h3 font-bold text-text">{@handle}</h1>
+        <p class="text-small text-text-faint">MBTI Analysis</p>
       </div>
     </div>
+
+    <div class="flex items-center gap-2">
+      <%= if @is_expired do %>
+        <span class="flex items-center gap-1.5 rounded-pill border border-border bg-surface-2 px-3 py-2 text-badge text-text-faint">
+          <.icon name="hero-clock" class="size-4" /> Cache expired
+        </span>
+      <% end %>
+
+      <button
+        phx-click="regenerate"
+        disabled={@is_regenerating}
+        class="inline-flex items-center gap-2 rounded-pill bg-text px-4 py-2 text-small font-bold text-canvas transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <.icon
+          name="hero-arrow-path"
+          class={["size-4", @is_regenerating && "motion-safe:animate-spin"]}
+        />
+        <span class="hidden sm:inline">Regenerate</span>
+      </button>
+
+      <.link
+        navigate={~p"/"}
+        class="inline-flex items-center gap-2 rounded-pill border border-border bg-surface-2 px-4 py-2 text-small font-bold text-text transition-colors hover:bg-surface-3"
+      >
+        <.icon name="hero-home" class="size-4" />
+        <span class="hidden sm:inline">New</span>
+      </.link>
+    </div>
   </div>
+
+  <.async_result :let={result} assign={@result}>
+    <:loading>
+      <.result_loading id="result-loading" />
+    </:loading>
+
+    <:failed :let={failure}>
+      <.result_error id="result-error" message={elem(failure, 1)} />
+    </:failed>
+
+    <div
+      :if={@mbti_info != nil}
+      style={"--type-accent: var(#{@mbti_info.accent_css_var})"}
+      class="space-y-16 py-8 md:py-12"
+    >
+      <.type_hero
+        id="result-type-hero"
+        type={result["type"]}
+        type_name={@mbti_info.name}
+        group_label={@mbti_info.group_label}
+        accent_css_var={@mbti_info.accent_css_var}
+        description={@mbti_info.description}
+      />
+
+      <section id="result-section-dimensions" phx-hook="RevealOnScroll" class="space-y-4">
+        <h3 class="text-badge font-bold uppercase tracking-[0.2em] text-text-faint">
+          Dimensions
+        </h3>
+        <.dimension_grid
+          id="result-dimensions"
+          dimensions={@mbti_info.dimensions}
+          accent_css_var={@mbti_info.accent_css_var}
+        />
+      </section>
+
+      <section id="result-section-traits" phx-hook="RevealOnScroll" class="space-y-4">
+        <h3 class="text-badge font-bold uppercase tracking-[0.2em] text-text-faint">
+          Key Traits
+        </h3>
+        <.traits_list
+          id="result-traits"
+          traits={@mbti_info.traits}
+          accent_css_var={@mbti_info.accent_css_var}
+        />
+      </section>
+
+      <div
+        id="result-section-strengths"
+        phx-hook="RevealOnScroll"
+        class="grid gap-6 md:grid-cols-2"
+      >
+        <section class="space-y-4 rounded-xl border border-border bg-surface-2 p-6">
+          <h3 class="flex items-center gap-2 text-badge font-bold uppercase tracking-[0.2em] text-text-faint">
+            <.icon name="hero-check-circle" class="size-4 text-[var(--type-accent)]" /> Strengths
+          </h3>
+          <ul class="space-y-2">
+            <li :for={strength <- @mbti_info.strengths} class="flex items-start gap-2">
+              <.icon
+                name="hero-chevron-right"
+                class="mt-0.5 size-4 shrink-0 text-[var(--type-accent)]"
+              />
+              <span class="text-body-l text-text">{strength}</span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="space-y-4 rounded-xl border border-border bg-surface-2 p-6">
+          <h3 class="flex items-center gap-2 text-badge font-bold uppercase tracking-[0.2em] text-text-faint">
+            <.icon name="hero-x-circle" class="size-4 text-text-faint" /> Growth Areas
+          </h3>
+          <ul class="space-y-2">
+            <li :for={weakness <- @mbti_info.weaknesses} class="flex items-start gap-2">
+              <.icon name="hero-chevron-right" class="mt-0.5 size-4 shrink-0 text-text-faint" />
+              <span class="text-body-l text-text">{weakness}</span>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <section id="result-section-famous" phx-hook="RevealOnScroll" class="space-y-4">
+        <h3 class="text-badge font-bold uppercase tracking-[0.2em] text-text-faint">
+          Famous {@mbti_info.name}s
+        </h3>
+        <.famous_people
+          id="result-famous"
+          people={@mbti_info.famous_people}
+          accent_css_var={@mbti_info.accent_css_var}
+        />
+      </section>
+
+      <section id="result-section-careers" phx-hook="RevealOnScroll" class="space-y-4">
+        <h3 class="text-badge font-bold uppercase tracking-[0.2em] text-text-faint">
+          Well-Suited Careers
+        </h3>
+        <.careers_list id="result-careers" careers={@mbti_info.careers} />
+      </section>
+
+      <.ai_reason
+        id="result-reason"
+        reason={result["reason"]}
+        accent_css_var={@mbti_info.accent_css_var}
+      />
+
+      <section id="result-section-share" phx-hook="RevealOnScroll" class="space-y-4">
+        <h3 class="text-badge font-bold uppercase tracking-[0.2em] text-text-faint">
+          Share This Result
+        </h3>
+        <.share_bar id="result-share" share_url={~p"/result/#{@handle}"} />
+      </section>
+    </div>
+  </.async_result>
 </Layouts.app>

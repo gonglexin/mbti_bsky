@@ -1,105 +1,219 @@
-/* See the Tailwind configuration guide for advanced usage
-   https://tailwindcss.com/docs/configuration */
+/* Tailwind v4 entry. See DESIGN.md for the token contract. */
 
 @import "tailwindcss" source(none);
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap");
+
 @source "../css";
 @source "../js";
 @source "../../lib/mbti_bsky_web";
 
-/* A Tailwind plugin that makes "hero-#{ICON}" classes available.
-   The heroicons installation itself is managed by your mix.exs */
+/* Heroicons plugin (icon classes). */
 @plugin "../vendor/heroicons";
 
-/* daisyUI Tailwind Plugin. You can update this file by fetching the latest version with:
-   curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui.js
-   Make sure to look at the daisyUI changelog: https://daisyui.com/docs/changelog/ */
-@plugin "../vendor/daisyui" {
-  themes: false;
+/* ----------------------------------------------------------------------------
+   DESIGN.md tokens. Light values are the @theme defaults (registered on :root
+   and exposed as Tailwind utilities). Dark values override the same variables
+   under [data-theme="dark"] so every surface utility reskins automatically.
+---------------------------------------------------------------------------- */
+@theme {
+  /* --- Surfaces (light defaults; dark overridden below) --- */
+  --color-canvas: #fafafa;
+  --color-surface: #ffffff;
+  --color-surface-2: #f4f4f6;
+  --color-surface-3: #ececef;
+  --color-border: #e4e4e7;
+  --color-border-strong: #d4d4d8;
+  --color-text: oklch(0.18 0.01 260);
+  --color-text-muted: oklch(0.45 0.01 260);
+  --color-text-faint: oklch(0.60 0.008 260);
+
+  /* --- Per-type accents (16). Static across themes; L floor 0.70 for AA. --- */
+  /* Analysts (NT) — cyan/blue */
+  --type-intj: oklch(0.72 0.15 250);
+  --type-intp: oklch(0.74 0.14 230);
+  --type-entj: oklch(0.70 0.17 255);
+  --type-entp: oklch(0.75 0.16 215);
+  /* Diplomats (NF) — magenta/pink */
+  --type-infj: oklch(0.70 0.17 340);
+  --type-infp: oklch(0.74 0.16 0);
+  --type-enfj: oklch(0.72 0.18 350);
+  --type-enfp: oklch(0.76 0.17 15);
+  /* Sentinels (SJ) — amber/gold */
+  --type-istj: oklch(0.72 0.14 75);
+  --type-isfj: oklch(0.74 0.13 95);
+  --type-estj: oklch(0.70 0.15 70);
+  --type-esfj: oklch(0.76 0.14 85);
+  /* Explorers (SP) — green/lime */
+  --type-istp: oklch(0.72 0.16 155);
+  --type-isfp: oklch(0.74 0.15 140);
+  --type-estp: oklch(0.70 0.18 165);
+  --type-esfp: oklch(0.76 0.17 145);
+
+  /* --- Fonts --- */
+  --font-display: "Satoshi", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  /* --- Radius scale --- */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+  --radius-pill: 9999px;
+
+  /* --- Type scale (sizes; line-height/tracking applied per-use) --- */
+  --text-micro: 0.6875rem;
+  --text-badge: 0.75rem;
+  --text-small: 0.875rem;
+  --text-base: 1rem;
+  --text-body-l: 1.125rem;
+  --text-h3: 1.25rem;
+  --text-h2: 1.75rem;
+  --text-hero: clamp(2.75rem, 6vw, 5rem);
+  --text-type-name: clamp(3rem, 8vw, 6rem);
+
+  /* --- Motion durations (DESIGN.md §6) --- */
+  --motion-micro: 120ms;
+  --motion-standard: 220ms;
+  --motion-emphasis: 480ms;
 }
 
-/* daisyUI theme plugin. You can update this file by fetching the latest version with:
-  curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui-theme.js
-  We ship with two themes, a light one inspired on Phoenix colors and a dark one inspired
-  on Elixir colors. Build your own at: https://daisyui.com/theme-generator/ */
-@plugin "../vendor/daisyui-theme" {
-  name: "dark";
-  default: false;
-  prefersdark: true;
-  color-scheme: "dark";
-  --color-base-100: oklch(30.33% 0.016 252.42);
-  --color-base-200: oklch(25.26% 0.014 253.1);
-  --color-base-300: oklch(20.15% 0.012 254.09);
-  --color-base-content: oklch(97.807% 0.029 256.847);
-  --color-primary: oklch(58% 0.233 277.117);
-  --color-primary-content: oklch(96% 0.018 272.314);
-  --color-secondary: oklch(58% 0.233 277.117);
-  --color-secondary-content: oklch(96% 0.018 272.314);
-  --color-accent: oklch(60% 0.25 292.717);
-  --color-accent-content: oklch(96% 0.016 293.756);
-  --color-neutral: oklch(37% 0.044 257.287);
-  --color-neutral-content: oklch(98% 0.003 247.858);
-  --color-info: oklch(58% 0.158 241.966);
-  --color-info-content: oklch(97% 0.013 236.62);
-  --color-success: oklch(60% 0.118 184.704);
-  --color-success-content: oklch(98% 0.014 180.72);
-  --color-warning: oklch(66% 0.179 58.318);
-  --color-warning-content: oklch(98% 0.022 95.277);
-  --color-error: oklch(58% 0.253 17.585);
-  --color-error-content: oklch(96% 0.015 12.422);
-  --radius-selector: 0.25rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.5rem;
-  --size-selector: 0.21875rem;
-  --size-field: 0.21875rem;
-  --border: 1.5px;
-  --depth: 1;
-  --noise: 0;
+/* Dark theme is DEFAULT. Override the surface/text variables under data-theme.
+   The :root defaults above are the LIGHT theme. */
+[data-theme="dark"] {
+  --color-canvas: oklch(0.14 0.005 260);
+  --color-surface: oklch(0.18 0.006 260);
+  --color-surface-2: oklch(0.21 0.007 260);
+  --color-surface-3: oklch(0.25 0.008 260);
+  --color-border: oklch(0.30 0.008 260);
+  --color-border-strong: oklch(0.38 0.008 260);
+  --color-text: #ffffff;
+  --color-text-muted: oklch(0.70 0.008 260);
+  --color-text-faint: oklch(0.50 0.008 260);
 }
 
-@plugin "../vendor/daisyui-theme" {
-  name: "light";
-  default: true;
-  prefersdark: false;
-  color-scheme: "light";
-  --color-base-100: oklch(98% 0 0);
-  --color-base-200: oklch(96% 0.001 286.375);
-  --color-base-300: oklch(92% 0.004 286.32);
-  --color-base-content: oklch(21% 0.006 285.885);
-  --color-primary: oklch(70% 0.213 47.604);
-  --color-primary-content: oklch(98% 0.016 73.684);
-  --color-secondary: oklch(55% 0.027 264.364);
-  --color-secondary-content: oklch(98% 0.002 247.839);
-  --color-accent: oklch(0% 0 0);
-  --color-accent-content: oklch(100% 0 0);
-  --color-neutral: oklch(44% 0.017 285.786);
-  --color-neutral-content: oklch(98% 0 0);
-  --color-info: oklch(62% 0.214 259.815);
-  --color-info-content: oklch(97% 0.014 254.604);
-  --color-success: oklch(70% 0.14 182.503);
-  --color-success-content: oklch(98% 0.014 180.72);
-  --color-warning: oklch(66% 0.179 58.318);
-  --color-warning-content: oklch(98% 0.022 95.277);
-  --color-error: oklch(58% 0.253 17.585);
-  --color-error-content: oklch(96% 0.015 12.422);
-  --radius-selector: 0.25rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.5rem;
-  --size-selector: 0.21875rem;
-  --size-field: 0.21875rem;
-  --border: 1.5px;
-  --depth: 1;
-  --noise: 0;
-}
+/* ----------------------------------------------------------------------------
+   Variants
+---------------------------------------------------------------------------- */
 
-/* Add variants based on LiveView classes */
+/* Tailwind's dark: variant keys on data-theme (so dark: utilities are explicit
+   and don't depend on prefers-color-scheme). */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* LiveView loading-state variants. */
 @custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
 @custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
 @custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
 
-/* Use the data attribute for dark mode  */
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+/* ----------------------------------------------------------------------------
+   Base
+---------------------------------------------------------------------------- */
 
-/* Make LiveView wrapper divs transparent for layout */
-[data-phx-session], [data-phx-teleported-src] { display: contents }
+/* Make LiveView wrapper divs transparent for layout. */
+[data-phx-session],
+[data-phx-teleported-src] {
+  display: contents;
+}
 
-/* This file is for your main application CSS */
+/* Body defaults to the canvas + system font (zero font payload for chrome). */
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display utility (Satoshi) for personality moments. */
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Shadow tokens (DESIGN.md §2.3). */
+.shadow-subtle {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.shadow-default {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+.shadow-prominent {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+[data-theme="dark"] .shadow-subtle {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+[data-theme="dark"] .shadow-default {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* ----------------------------------------------------------------------------
+   Motion (DESIGN.md §6). Keyframes + utility classes for per-letter cascade,
+   section entry, and ambient orb bloom. Reduced motion keeps opacity only.
+---------------------------------------------------------------------------- */
+
+@keyframes type-letter-cascade {
+  from {
+    opacity: 0;
+    transform: translateY(0.5em) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes section-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes orb-bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-only {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-type-cascade {
+  animation: type-letter-cascade var(--motion-emphasis) cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-section-in {
+  animation: section-fade-in var(--motion-standard) cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-orb-bloom {
+  animation: orb-bloom var(--motion-emphasis) cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Reduced motion: keep a quick opacity fade, drop transforms + per-letter stagger. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-type-cascade,
+  .animate-section-in,
+  .animate-orb-bloom {
+    animation-name: fade-only !important;
+    animation-duration: var(--motion-micro) !important;
+    animation-delay: 0ms !important;
+  }
+}

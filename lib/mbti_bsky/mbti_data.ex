@@ -3,7 +3,7 @@ defmodule MbtiBsky.MbtiData do
   Comprehensive MBTI type data including descriptions, traits, and famous people.
   """
 
-  @mbti_types %{
+  @raw_mbti_types %{
     "INTJ" => %{
       name: "The Architect",
       description: "Imaginative and strategic thinkers with a plan for everything.",
@@ -586,10 +586,50 @@ defmodule MbtiBsky.MbtiData do
     }
   }
 
+  # Group derived from type letters: N+T Analysts, N+F Diplomats, S+J Sentinels, S+P Explorers.
+  @mbti_types (for {type, data} <- @raw_mbti_types, into: %{} do
+                 {group, group_label} =
+                   case type do
+                     <<_, ?N, ?T, _>> -> {:analysts, "Analyst"}
+                     <<_, ?N, ?F, _>> -> {:diplomats, "Diplomat"}
+                     <<_, ?S, _, ?J>> -> {:sentinels, "Sentinel"}
+                     <<_, ?S, _, ?P>> -> {:explorers, "Explorer"}
+                   end
+
+                 {type,
+                  Map.merge(data, %{
+                    group: group,
+                    group_label: group_label,
+                    accent_css_var: "--type-" <> String.downcase(type)
+                  })}
+               end)
+
   @doc """
   Get all MBTI type information.
   """
   def all_types, do: @mbti_types
+
+  @doc """
+  Returns the group atom (`:analysts`, `:diplomats`, `:sentinels`, `:explorers`)
+  for the given type, or `nil` if unknown.
+  """
+  def group(type) when is_binary(type) do
+    case get_type(type) do
+      nil -> nil
+      data -> Map.get(data, :group)
+    end
+  end
+
+  @doc """
+  Returns the CSS custom property name holding the accent color (e.g. `--type-intj`),
+  or `nil` if the type is unknown.
+  """
+  def accent_var(type) when is_binary(type) do
+    case get_type(type) do
+      nil -> nil
+      data -> Map.get(data, :accent_css_var)
+    end
+  end
 
   @doc """
   Get information for a specific MBTI type.

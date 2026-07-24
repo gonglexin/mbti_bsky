@@ -1,31 +1,9 @@
 defmodule MbtiBskyWeb.CoreComponents do
   @moduledoc """
-  Provides core UI components.
-
-  At first glance, this module may seem daunting, but its goal is to provide
-  core building blocks for your application, such as tables, forms, and
-  inputs. The components consist mostly of markup and are well-documented
-  with doc strings and declarative assigns. You may customize and style
-  them in any way you want, based on your application growth and needs.
-
-  The foundation for styling is Tailwind CSS, a utility-first CSS framework,
-  augmented with daisyUI, a Tailwind CSS plugin that provides UI components
-  and themes. Here are useful references:
-
-    * [daisyUI](https://daisyui.com/docs/intro/) - a good place to get
-      started and see the available components.
-
-    * [Tailwind CSS](https://tailwindcss.com) - the foundational framework
-      we build on. You will use it for layout, sizing, flexbox, grid, and
-      spacing.
-
-    * [Heroicons](https://heroicons.com) - see `icon/1` for usage.
-
-    * [Phoenix.Component](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html) -
-      the component system used by Phoenix. Some components, such as `<.link>`
-      and `<.form>`, are defined there.
-
+  Provides core UI components styled with plain Tailwind tokens (see DESIGN.md).
+  daisyUI has been removed; every class below traces to a @theme token.
   """
+
   use Phoenix.Component
   use Gettext, backend: MbtiBskyWeb.Gettext
 
@@ -56,21 +34,20 @@ defmodule MbtiBskyWeb.CoreComponents do
       id={@id}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
-      class="toast toast-top toast-end z-50"
+      class="fixed top-4 right-4 z-50"
       {@rest}
     >
       <div class={[
-        "alert w-80 sm:w-96 max-w-80 sm:max-w-96 text-wrap",
-        @kind == :info && "alert-info",
-        @kind == :error && "alert-error"
+        "flex w-80 max-w-80 items-start gap-3 rounded-lg border px-4 py-3 shadow-default sm:w-96 sm:max-w-96",
+        @kind == :info && "border-border bg-surface-2 text-text",
+        @kind == :error && "border-red-500/40 bg-red-500/10 text-red-300"
       ]}>
         <.icon :if={@kind == :info} name="hero-information-circle" class="size-5 shrink-0" />
         <.icon :if={@kind == :error} name="hero-exclamation-circle" class="size-5 shrink-0" />
-        <div>
+        <div class="flex-1">
           <p :if={@title} class="font-semibold">{@title}</p>
-          <p>{msg}</p>
+          <p class="text-small">{msg}</p>
         </div>
-        <div class="flex-1" />
         <button type="button" class="group self-start cursor-pointer" aria-label={gettext("close")}>
           <.icon name="hero-x-mark-solid" class="size-5 opacity-40 group-hover:opacity-70" />
         </button>
@@ -94,11 +71,17 @@ defmodule MbtiBskyWeb.CoreComponents do
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
-    variants = %{"primary" => "btn-primary", nil => "btn-primary btn-soft"}
+    base =
+      "inline-flex items-center justify-center gap-2 rounded-pill px-5 py-2.5 text-small font-bold tracking-wide transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+
+    variants = %{
+      "primary" => "bg-text text-canvas hover:opacity-90",
+      nil => "border border-border bg-surface-2 text-text hover:bg-surface-3"
+    }
 
     assigns =
       assign_new(assigns, :class, fn ->
-        ["btn", Map.fetch!(variants, assigns[:variant])]
+        [base, Map.fetch!(variants, assigns[:variant])]
       end)
 
     if rest[:href] || rest[:navigate] || rest[:patch] do
@@ -205,8 +188,8 @@ defmodule MbtiBskyWeb.CoreComponents do
       end)
 
     ~H"""
-    <div class="fieldset mb-2">
-      <label>
+    <div class="mb-2">
+      <label class="flex items-center gap-2 text-small text-text">
         <input
           type="hidden"
           name={@name}
@@ -214,17 +197,18 @@ defmodule MbtiBskyWeb.CoreComponents do
           disabled={@rest[:disabled]}
           form={@rest[:form]}
         />
-        <span class="label">
-          <input
-            type="checkbox"
-            id={@id}
-            name={@name}
-            value="true"
-            checked={@checked}
-            class={@class || "checkbox checkbox-sm"}
-            {@rest}
-          />{@label}
-        </span>
+        <input
+          type="checkbox"
+          id={@id}
+          name={@name}
+          value="true"
+          checked={@checked}
+          class={
+            @class ||
+              "size-4 rounded-sm border border-border bg-surface text-text focus:ring-2 focus:ring-text/20"
+          }
+          {@rest}
+        />{@label}
       </label>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
@@ -233,13 +217,18 @@ defmodule MbtiBskyWeb.CoreComponents do
 
   def input(%{type: "select"} = assigns) do
     ~H"""
-    <div class="fieldset mb-2">
-      <label>
-        <span :if={@label} class="label mb-1">{@label}</span>
+    <div class="mb-2">
+      <label class="block">
+        <span :if={@label} class="mb-1 block text-small font-semibold text-text-muted">{@label}</span>
         <select
           id={@id}
           name={@name}
-          class={[@class || "w-full select", @errors != [] && (@error_class || "select-error")]}
+          class={[
+            @class ||
+              "w-full rounded-md border border-border bg-surface px-3 py-2 text-base text-text placeholder:text-text-faint focus:border-border-strong focus:outline-none focus:ring-2 focus:ring-text/20 transition-colors",
+            @errors != [] &&
+              (@error_class || "border-red-500/60 focus:border-red-500 focus:ring-red-500/20")
+          ]}
           multiple={@multiple}
           {@rest}
         >
@@ -254,38 +243,42 @@ defmodule MbtiBskyWeb.CoreComponents do
 
   def input(%{type: "textarea"} = assigns) do
     ~H"""
-    <fieldset class="fieldset mb-2">
-      <label>
-        <span :if={@label} class="label mb-1">{@label}</span>
+    <div class="mb-2">
+      <label class="block">
+        <span :if={@label} class="mb-1 block text-small font-semibold text-text-muted">{@label}</span>
         <textarea
           id={@id}
           name={@name}
           class={[
-            @class || "w-full textarea",
-            @errors != [] && (@error_class || "textarea-error")
+            @class ||
+              "w-full rounded-md border border-border bg-surface px-3 py-2 text-base text-text placeholder:text-text-faint focus:border-border-strong focus:outline-none focus:ring-2 focus:ring-text/20 transition-colors",
+            @errors != [] &&
+              (@error_class || "border-red-500/60 focus:border-red-500 focus:ring-red-500/20")
           ]}
           {@rest}
         >{Phoenix.HTML.Form.normalize_value("textarea", @value)}</textarea>
       </label>
       <.error :for={msg <- @errors}>{msg}</.error>
-    </fieldset>
+    </div>
     """
   end
 
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <div class="fieldset mb-2">
-      <label>
-        <span :if={@label} class="label mb-1">{@label}</span>
+    <div class="mb-2">
+      <label class="block">
+        <span :if={@label} class="mb-1 block text-small font-semibold text-text-muted">{@label}</span>
         <input
           type={@type}
           name={@name}
           id={@id}
           value={Phoenix.HTML.Form.normalize_value(@type, @value)}
           class={[
-            @class || "w-full input",
-            @errors != [] && (@error_class || "input-error")
+            @class ||
+              "w-full rounded-md border border-border bg-surface px-3 py-2 text-base text-text placeholder:text-text-faint focus:border-border-strong focus:outline-none focus:ring-2 focus:ring-text/20 transition-colors",
+            @errors != [] &&
+              (@error_class || "border-red-500/60 focus:border-red-500 focus:ring-red-500/20")
           ]}
           {@rest}
         />
@@ -298,8 +291,8 @@ defmodule MbtiBskyWeb.CoreComponents do
   # Helper used by inputs to generate form errors
   defp error(assigns) do
     ~H"""
-    <p class="mt-1.5 flex gap-2 items-center text-sm text-error">
-      <.icon name="hero-exclamation-circle" class="size-5" />
+    <p class="mt-1.5 flex items-center gap-2 text-small text-red-400">
+      <.icon name="hero-exclamation-circle" class="size-4" />
       {render_slot(@inner_block)}
     </p>
     """
@@ -319,7 +312,7 @@ defmodule MbtiBskyWeb.CoreComponents do
         <h1 class="text-lg font-semibold leading-8">
           {render_slot(@inner_block)}
         </h1>
-        <p :if={@subtitle != []} class="text-sm text-base-content/70">
+        <p :if={@subtitle != []} class="text-small text-text-muted">
           {render_slot(@subtitle)}
         </p>
       </div>
@@ -360,25 +353,25 @@ defmodule MbtiBskyWeb.CoreComponents do
       end
 
     ~H"""
-    <table class="table table-zebra">
+    <table class="w-full border-collapse text-small">
       <thead>
-        <tr>
-          <th :for={col <- @col}>{col[:label]}</th>
-          <th :if={@action != []}>
+        <tr class="border-b border-border text-left text-text-faint">
+          <th :for={col <- @col} class="px-3 py-2 font-semibold">{col[:label]}</th>
+          <th :if={@action != []} class="px-3 py-2">
             <span class="sr-only">{gettext("Actions")}</span>
           </th>
         </tr>
       </thead>
       <tbody id={@id} phx-update={is_struct(@rows, Phoenix.LiveView.LiveStream) && "stream"}>
-        <tr :for={row <- @rows} id={@row_id && @row_id.(row)}>
+        <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="border-b border-border/50">
           <td
             :for={col <- @col}
             phx-click={@row_click && @row_click.(row)}
-            class={@row_click && "hover:cursor-pointer"}
+            class={["px-3 py-2", @row_click && "hover:cursor-pointer"]}
           >
             {render_slot(col, @row_item.(row))}
           </td>
-          <td :if={@action != []} class="w-0 font-semibold">
+          <td :if={@action != []} class="w-0 px-3 py-2 font-semibold">
             <div class="flex gap-4">
               <%= for action <- @action do %>
                 {render_slot(action, @row_item.(row))}
@@ -407,12 +400,10 @@ defmodule MbtiBskyWeb.CoreComponents do
 
   def list(assigns) do
     ~H"""
-    <ul class="list">
-      <li :for={item <- @item} class="list-row">
-        <div class="list-col-grow">
-          <div class="font-bold">{item.title}</div>
-          <div>{render_slot(item)}</div>
-        </div>
+    <ul class="divide-y divide-border overflow-hidden rounded-lg border border-border">
+      <li :for={item <- @item} class="px-4 py-3">
+        <div class="font-bold text-text">{item.title}</div>
+        <div class="text-small text-text-muted">{render_slot(item)}</div>
       </li>
     </ul>
     """
@@ -472,16 +463,6 @@ defmodule MbtiBskyWeb.CoreComponents do
   Translates an error message using gettext.
   """
   def translate_error({msg, opts}) do
-    # When using gettext, we typically pass the strings we want
-    # to translate as a static argument:
-    #
-    #     # Translate the number of files with plural rules
-    #     dngettext("errors", "1 file", "%{count} files", count)
-    #
-    # However the error messages in our forms and APIs are generated
-    # dynamically, so we need to translate them by calling Gettext
-    # with our gettext backend as first argument. Translations are
-    # available in the errors.po file (as we use the "errors" domain).
     if count = opts[:count] do
       Gettext.dngettext(MbtiBskyWeb.Gettext, "errors", msg, msg, count, opts)
     else
