@@ -93,10 +93,14 @@
   --color-text-faint: oklch(0.50 0.008 260);
 }
 
-/* Unified brand accent — single indigo/violet for all result pages.
-   Components reference var(--type-accent); this is the one source of truth. */
+/* Unified brand accent — strict monochrome. Black in light theme, white in
+   dark theme. Components reference var(--type-accent); this is the one source
+   of truth. Keeps contrast AA in both themes. */
 :root {
-  --type-accent: oklch(0.65 0.14 275);
+  --type-accent: oklch(0.18 0.01 260);
+}
+[data-theme="dark"] {
+  --type-accent: oklch(0.98 0 0);
 }
 
 /* ----------------------------------------------------------------------------
