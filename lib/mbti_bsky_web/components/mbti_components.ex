@@ -4,9 +4,9 @@ defmodule MbtiBskyWeb.MbtiComponents do
 
   The 11 components here are the single source of truth for how MBTI content
   is rendered. Every value traces to a token defined in DESIGN.md §2–§4 and
-  exposed through `assets/css/app.css` `@theme`. Per-type accent color flows
-  through an inline `--type-accent` custom property so the same component
-  recolors itself for any of the 16 types without hard-coded classes.
+  exposed through `assets/css/app.css` `@theme`. A unified brand accent flows
+  through the global `--type-accent` custom property so every type renders
+  consistently without hard-coded classes.
 
   Refer to DESIGN.md §5 for the primitive inventory.
   """
@@ -41,14 +41,13 @@ defmodule MbtiBskyWeb.MbtiComponents do
 
   @doc """
   Renders the large MBTI type centerpiece: group label, 4-letter type,
-  type name, description, and an ambient accent orb. Recolors itself via
-  the per-type `--type-accent` custom property.
+  type name, description, and an ambient accent orb. Uses the global
+  `--type-accent` brand color.
   """
   attr :id, :string, default: "type-hero"
   attr :type, :string, required: true
   attr :type_name, :string, required: true
   attr :group_label, :string, required: true
-  attr :accent_css_var, :string, required: true
   attr :description, :string, required: true
 
   def type_hero(assigns) do
@@ -56,12 +55,11 @@ defmodule MbtiBskyWeb.MbtiComponents do
     <section
       id={@id}
       class="relative overflow-hidden rounded-xl border border-border bg-surface-2 p-8 md:p-16 text-center"
-      style={"--type-accent: var(#{@accent_css_var})"}
     >
       <div
         aria-hidden="true"
         class="pointer-events-none absolute left-1/2 top-1/2 size-64 md:size-80 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 blur-3xl animate-orb-bloom"
-        style={"background: radial-gradient(circle, var(#{@accent_css_var}), transparent 70%)"}
+        style="background: radial-gradient(circle, var(--type-accent), transparent 70%)"
       />
       <div class="relative">
         <p class="mb-4 text-badge font-bold uppercase tracking-[0.25em] text-[var(--type-accent)]">
@@ -91,23 +89,18 @@ defmodule MbtiBskyWeb.MbtiComponents do
   @doc """
   Renders the four cognitive-function axis cards from a `dimensions` map
   shaped like `%{"E/I" => "Introvert", ...}` (the winning trait word).
-  The winning pole is highlighted with the per-type accent.
+  The winning pole is highlighted with the global accent.
   """
   attr :id, :string, default: "dimension-grid"
   attr :dimensions, :map, required: true
-  attr :accent_css_var, :string, required: true
 
   def dimension_grid(assigns) do
-    axes = @dimension_axes
+    assigns = assign(assigns, :axes, @dimension_axes)
 
     ~H"""
-    <div
-      id={@id}
-      class="grid grid-cols-1 gap-4 sm:grid-cols-2"
-      style={"--type-accent: var(#{@accent_css_var})"}
-    >
+    <div id={@id} class="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <.dimension_card
-        :for={{axis, label, left, right} <- axes}
+        :for={{axis, label, left, right} <- @axes}
         axis={axis}
         label={label}
         left_pole={left}
@@ -185,15 +178,10 @@ defmodule MbtiBskyWeb.MbtiComponents do
   """
   attr :id, :string, default: "traits-list"
   attr :traits, :list, required: true
-  attr :accent_css_var, :string, required: true
 
   def traits_list(assigns) do
     ~H"""
-    <ul
-      id={@id}
-      class="flex flex-wrap gap-2"
-      style={"--type-accent: var(#{@accent_css_var})"}
-    >
+    <ul id={@id} class="flex flex-wrap gap-2">
       <li
         :for={trait <- @traits}
         class="rounded-pill border border-[var(--type-accent)]/30 bg-[var(--type-accent)]/10 px-4 py-2 text-small font-medium text-text transition-transform hover:scale-105"
@@ -236,15 +224,10 @@ defmodule MbtiBskyWeb.MbtiComponents do
   """
   attr :id, :string, default: "famous-people"
   attr :people, :list, required: true
-  attr :accent_css_var, :string, default: nil
 
   def famous_people(assigns) do
     ~H"""
-    <ul
-      id={@id}
-      class="grid grid-cols-1 gap-3 sm:grid-cols-2"
-      style={if @accent_css_var, do: "--type-accent: var(#{@accent_css_var})"}
-    >
+    <ul id={@id} class="grid grid-cols-1 gap-3 sm:grid-cols-2">
       <li
         :for={person <- @people}
         class="group flex items-center gap-3 rounded-lg border border-border bg-surface-2 px-4 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-default"
@@ -270,15 +253,10 @@ defmodule MbtiBskyWeb.MbtiComponents do
   """
   attr :id, :string, default: "ai-reason"
   attr :reason, :string, required: true
-  attr :accent_css_var, :string, required: true
 
   def ai_reason(assigns) do
     ~H"""
-    <div
-      id={@id}
-      class="rounded-xl border border-border bg-surface-2 p-6"
-      style={"--type-accent: var(#{@accent_css_var})"}
-    >
+    <div id={@id} class="rounded-xl border border-border bg-surface-2 p-6">
       <div class="mb-3 flex items-center gap-2 text-text-faint">
         <.icon name="hero-sparkles" class="size-4 text-[var(--type-accent)]" />
         <span class="text-small font-bold uppercase tracking-[0.2em]">AI Analysis</span>

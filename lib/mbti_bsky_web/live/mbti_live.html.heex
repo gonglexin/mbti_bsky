@@ -1,5 +1,5 @@
 <Layouts.app flash={@flash}>
-  <div :if={!@result.loading} style="--type-accent: var(--type-intj)">
+  <div :if={!@result.loading}>
     <.result_empty id="home-empty">
       <.search_input id="home-search" placeholder="your-handle.bsky.social" />
     </.result_empty>

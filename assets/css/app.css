@@ -93,6 +93,12 @@
   --color-text-faint: oklch(0.50 0.008 260);
 }
 
+/* Unified brand accent — single indigo/violet for all result pages.
+   Components reference var(--type-accent); this is the one source of truth. */
+:root {
+  --type-accent: oklch(0.65 0.14 275);
+}
+
 /* ----------------------------------------------------------------------------
    Variants
 ---------------------------------------------------------------------------- */

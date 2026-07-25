@@ -64,17 +64,12 @@
       <.result_error id="result-error" message={elem(failure, 1)} />
     </:failed>
 
-    <div
-      :if={@mbti_info != nil}
-      style={"--type-accent: var(#{@mbti_info.accent_css_var})"}
-      class="space-y-16 py-8 md:py-12"
-    >
+    <div :if={@mbti_info != nil} class="space-y-16 py-8 md:py-12">
       <.type_hero
         id="result-type-hero"
         type={result["type"]}
         type_name={@mbti_info.name}
         group_label={@mbti_info.group_label}
-        accent_css_var={@mbti_info.accent_css_var}
         description={@mbti_info.description}
       />
 
@@ -85,7 +80,6 @@
         <.dimension_grid
           id="result-dimensions"
           dimensions={@mbti_info.dimensions}
-          accent_css_var={@mbti_info.accent_css_var}
         />
       </section>
 
@@ -96,7 +90,6 @@
         <.traits_list
           id="result-traits"
           traits={@mbti_info.traits}
-          accent_css_var={@mbti_info.accent_css_var}
         />
       </section>
 
@@ -140,7 +133,6 @@
         <.famous_people
           id="result-famous"
           people={@mbti_info.famous_people}
-          accent_css_var={@mbti_info.accent_css_var}
         />
       </section>
 
@@ -154,7 +146,6 @@
       <.ai_reason
         id="result-reason"
         reason={result["reason"]}
-        accent_css_var={@mbti_info.accent_css_var}
       />
 
       <section id="result-section-share" phx-hook="RevealOnScroll" class="space-y-4">
