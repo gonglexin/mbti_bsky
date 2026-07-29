@@ -29,7 +29,7 @@ defmodule MbtiBskyWeb.Layouts do
 
   attr :current_scope, :map,
     default: nil,
-    doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
+    doc: "the current [scope](https://phoenix.hexdocs.pm/scopes.html)"
 
   slot :inner_block, required: true
 
@@ -95,7 +95,10 @@ defmodule MbtiBskyWeb.Layouts do
         id="client-error"
         kind={:error}
         title={gettext("We can't find the internet")}
-        phx-disconnected={show(".phx-client-error #client-error") |> JS.remove_attribute("hidden")}
+        phx-disconnected={
+          show(".phx-client-error #client-error")
+          |> JS.remove_attribute("hidden", to: ".phx-client-error #client-error")
+        }
         phx-connected={hide("#client-error") |> JS.set_attribute({"hidden", ""})}
         hidden
       >
@@ -107,7 +110,10 @@ defmodule MbtiBskyWeb.Layouts do
         id="server-error"
         kind={:error}
         title={gettext("Something went wrong!")}
-        phx-disconnected={show(".phx-server-error #server-error") |> JS.remove_attribute("hidden")}
+        phx-disconnected={
+          show(".phx-server-error #server-error")
+          |> JS.remove_attribute("hidden",  to: ".phx-server-error #server-error")
+        }
         phx-connected={hide("#server-error") |> JS.set_attribute({"hidden", ""})}
         hidden
       >
@@ -126,7 +132,7 @@ defmodule MbtiBskyWeb.Layouts do
   def theme_toggle(assigns) do
     ~H"""
     <div class="relative flex flex-row items-center rounded-pill border border-border bg-surface-2">
-      <div class="pointer-events-none absolute left-0 h-full w-1/3 rounded-pill bg-surface-3 transition-[left] [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3" />
+      <div class="pointer-events-none absolute left-0 h-full w-1/3 rounded-pill bg-surface-3 transition-[left] [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3 [[data-theme-source=system]_&]:!left-0" />
 
       <button
         class="relative z-10 flex w-1/3 cursor-pointer justify-center p-2 opacity-60 hover:opacity-100"

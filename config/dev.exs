@@ -18,20 +18,6 @@ config :mbti_bsky, MbtiBskyWeb.Endpoint,
     tailwind: {Tailwind, :install_and_run, [:mbti_bsky, ~w(--watch)]}
   ]
 
-config :mbti_bsky, MbtiBskyWeb.Endpoint,
-  live_reload: [
-    web_console_logger: true,
-    patterns: [
-      # Static assets, except user uploads
-      ~r"priv/static/(?!uploads/).*\.(js|css|png|jpeg|jpg|gif|svg)$"E,
-      # Gettext translations
-      ~r"priv/gettext/.*\.(po)$"E,
-      # Router, Controllers, LiveViews and LiveComponents
-      ~r"lib/mbti_bsky_web/router\.ex$"E,
-      ~r"lib/mbti_bsky_web/(controllers|live|components|router)/.*\.(ex|heex)$"E
-    ]
-  ]
-
 # Enable dev routes for dashboard and mailbox
 config :mbti_bsky, dev_routes: true
 
