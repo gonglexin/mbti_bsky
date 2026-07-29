@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for mbti-bsky on 2024-12-19T00:49:37+08:00
+# fly.toml app configuration file generated for mbti-bsky on 2026-07-29T18:25:11+08:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -8,6 +8,8 @@ primary_region = 'sjc'
 kill_signal = 'SIGTERM'
 
 [build]
+[deploy]
+  release_command = "/bin/sh -lc 'DATABASE_URL=$DIRECT_DATABASE_URL /app/bin/migrate'"
 
 [env]
   PHX_HOST = 'mbti.blue'
@@ -25,8 +27,3 @@ kill_signal = 'SIGTERM'
     type = 'connections'
     hard_limit = 1000
     soft_limit = 1000
-
-[[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
-  cpus = 1

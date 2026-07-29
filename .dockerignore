@@ -30,6 +30,8 @@
 /test/
 /tmp/
 .elixir_ls
+.expert
+.dexter
 
 # Mix artifacts
 /_build/

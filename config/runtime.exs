@@ -32,7 +32,14 @@ if config_env() == :prod do
       For example: postgresql://USER:PASS@HOST/DATABASE
       """
 
-  config :mbti_bsky, MbtiBsky.Repo, url: database_url
+  # Fly.io Managed Postgres: the *.flympg.net hostnames resolve to IPv6-only
+  # (AAAA records), so Postgrex must resolve over IPv6 to avoid :nxdomain.
+  # `prepare: :unnamed` is required for PgBouncer in transaction pooling mode.
+  config :mbti_bsky, MbtiBsky.Repo,
+    url: database_url,
+    socket_options: [:inet6],
+    pool_size: 10,
+    prepare: :unnamed
 end
 
 if config_env() == :prod do
