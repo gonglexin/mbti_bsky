@@ -3,7 +3,9 @@
     export default {
       mounted() {
         this.handleEvent("copy_url", ({ url }) => {
-          navigator.clipboard.writeText(url);
+          navigator.clipboard.writeText(url)
+            .then(() => this.pushEvent("copied_to_clipboard"))
+            .catch(() => {});
         });
         this.handleEvent("select_input", ({ id }) => {
           const input = document.getElementById(id);
@@ -14,6 +16,9 @@
       }
     }
   </script>
+
+  <%!-- Mounts the .ShareHandler hook so copy/select events are received --%>
+  <div id="share-handler" phx-hook=".ShareHandler" class="hidden" />
 
   <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
     <div class="flex items-center gap-3">
@@ -152,7 +157,7 @@
         <h3 class="text-badge font-bold uppercase tracking-[0.2em] text-text-faint">
           Share This Result
         </h3>
-        <.share_bar id="result-share" share_url={~p"/result/#{@handle}"} />
+        <.share_bar id="result-share" share_url={@share_url} />
       </section>
     </div>
   </.async_result>

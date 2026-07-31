@@ -9,6 +9,7 @@ defmodule MbtiBskyWeb.ResultLive do
     socket =
       socket
       |> assign(:handle, handle)
+      |> assign(:share_url, share_url(handle))
       |> assign(:result, AsyncResult.loading())
       |> assign(:mbti_info, nil)
       |> assign(:is_regenerating, false)
@@ -21,6 +22,7 @@ defmodule MbtiBskyWeb.ResultLive do
     socket =
       socket
       |> assign(:handle, handle)
+      |> assign(:share_url, share_url(handle))
       |> maybe_load_cached_result()
 
     {:noreply, socket}
@@ -43,11 +45,15 @@ defmodule MbtiBskyWeb.ResultLive do
   end
 
   def handle_event("copy_share_url", _params, socket) do
-    {:noreply, push_event(socket, "copy_url", %{url: ~p"/result/#{socket.assigns.handle}"})}
+    {:noreply, push_event(socket, "copy_url", %{url: socket.assigns.share_url})}
   end
 
   def handle_event("select_share_url", _params, socket) do
     {:noreply, push_event(socket, "select_input", %{id: "share-url"})}
+  end
+
+  def handle_event("copied_to_clipboard", _params, socket) do
+    {:noreply, put_flash(socket, :info, "Link copied to clipboard!")}
   end
 
   def handle_async(:analysis, {:ok, {:ok, result}}, socket) do
@@ -139,5 +145,9 @@ defmodule MbtiBskyWeb.ResultLive do
       e ->
         {:error, "Something wrong! #{inspect(e)}"}
     end
+  end
+
+  defp share_url(handle) do
+    MbtiBskyWeb.Endpoint.url() <> ~p"/result/#{handle}"
   end
 end
